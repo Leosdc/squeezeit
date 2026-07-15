@@ -80,6 +80,45 @@ h1 {
   transition: var(--transition);
 }
 
+/* Alternador de Idioma */
+.lang-selector {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: -12px;
+  margin-bottom: -12px;
+  padding-right: 4px;
+}
+
+.lang-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  padding: 2px 4px;
+}
+
+.lang-btn:hover {
+  color: var(--text-primary);
+}
+
+.lang-btn.active {
+  color: var(--accent-color);
+  font-weight: 700;
+}
+
+.lang-divider {
+  color: var(--border-strong);
+  font-size: 0.72rem;
+}
+
 /* Wrappers Modulares */
 .canvas-side {
   display: flex;

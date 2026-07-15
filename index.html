@@ -20,21 +20,28 @@
   </header>
 
   <main class="app-card">
+    <!-- Alternador de Idioma -->
+    <div class="lang-selector">
+      <button class="lang-btn active" id="lang-pt" onclick="switchLanguage('pt')">PT</button>
+      <span class="lang-divider">|</span>
+      <button class="lang-btn" id="lang-en" onclick="switchLanguage('en')">EN</button>
+    </div>
+
     <div class="toast" id="infoToast">Pronto para relaxar</div>
 
     <!-- Lado do Canvas (Esquerdo no desktop menor que FHD) -->
     <div class="canvas-side">
       <!-- Seletor de Modo -->
       <div class="mode-selector">
-        <button class="mode-btn active" onclick="switchMode('classic')">
+        <button class="mode-btn active" onclick="switchMode('classic')" id="btn-mode-classic">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><circle cx="12" cy="10" r="8"/><path d="M12 18v4"/></svg>
           Borracha
         </button>
-        <button class="mode-btn" onclick="switchMode('slime')">
+        <button class="mode-btn" onclick="switchMode('slime')" id="btn-mode-slime">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
           Slime
         </button>
-        <button class="mode-btn" onclick="switchMode('bubble')">
+        <button class="mode-btn" onclick="switchMode('bubble')" id="btn-mode-bubble">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><circle cx="7" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><circle cx="7" cy="17" r="3"/><circle cx="17" cy="17" r="3"/></svg>
           Plástico
         </button>
@@ -47,7 +54,7 @@
 
       <!-- Opções da grade do Plástico Bolha -->
       <div class="bubble-settings" id="bubbleSettings" style="display: none;">
-        <span class="settings-label">Tamanho da Grade</span>
+        <span class="settings-label" id="label-grid-size">Tamanho da Grade</span>
         <div class="grid-options">
           <button class="grid-opt-btn" onclick="changeGridSize(4)">4x4</button>
           <button class="grid-opt-btn active" onclick="changeGridSize(6)">6x6</button>
@@ -62,7 +69,7 @@
       <!-- Nível de Satisfação -->
       <div class="satisfaction-panel">
         <div class="satisfaction-header">
-          <span>Nível de Relaxamento</span>
+          <span id="label-satisfaction">Nível de Relaxamento</span>
           <span id="satisfactionPct">0%</span>
         </div>
         <div class="satisfaction-bar">
@@ -73,15 +80,15 @@
       <!-- Grid de Estatísticas -->
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-label">Apertos</div>
+          <div class="stat-label" id="label-stat-press">Apertos</div>
           <div class="stat-value" id="statPressCount">0</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Força Máx</div>
+          <div class="stat-label" id="label-stat-force">Força Máx</div>
           <div class="stat-value" id="statMaxForce">0%</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Foco</div>
+          <div class="stat-label" id="label-stat-mood">Foco</div>
           <div class="stat-value" id="statMood">Calmo</div>
         </div>
       </div>
@@ -89,7 +96,7 @@
       <!-- Painel de Conquistas -->
       <div class="achievements-panel">
         <div class="achievements-header">
-          <span>Conquistas</span>
+          <span id="label-achievements">Conquistas</span>
           <span id="unlockedRatio" style="color: var(--accent-color);">0/6</span>
         </div>
         <div class="achievements-list">
@@ -126,7 +133,7 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
           Som: On
         </button>
-        <button class="ctrl-btn" onclick="resetStats()">
+        <button class="ctrl-btn" onclick="resetStats()" id="resetBtn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
           Resetar
         </button>

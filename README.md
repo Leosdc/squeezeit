@@ -2,6 +2,8 @@
 
 Squeeze.it is a high-fidelity, client-side stress relief simulator built using vanilla web technologies. The project runs completely in the browser with zero external framework dependencies, providing a fluid, reactive, and physically simulated interactive soft-body ball.
 
+[Ler em Português](README.pt.md)
+
 ---
 
 ## Technical Architecture

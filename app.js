@@ -7,6 +7,7 @@ let soundEnabled = true;
 let audioCtx = null;
 let bubbleGridSize = 6;
 let knifeMode = false;
+let currentLang = localStorage.getItem('sq_lang') || 'pt';
 
 const stats = {
   pressCount: parseInt(localStorage.getItem('sq_pressCount') || '0'),
@@ -21,34 +22,139 @@ const KNIFE_UNLOCKED_ICON = `<svg width="20" height="20" viewBox="0 0 24 24" fil
 
 const ACHIEVEMENTS = {
   'first-press': { 
-    title: '1º Aperto', 
-    desc: 'Você deu o primeiro aperto!', 
     icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>` 
   },
   'force-100': { 
-    title: 'Super Força', 
-    desc: 'Esmagou com 100% de força!', 
     icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>` 
   },
   'satisfaction-100': { 
-    title: 'Soneca', 
-    desc: 'Deixou a bolinha tirar um cochilo por 10s!', 
     icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 0-9 9 9 9 0 0 0 9 9 9 9 0 0 0 9-9 9 9 0 0 0-9-9Zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6a5.978 5.978 0 0 1 4.14 1.66A9.03 9.03 0 0 0 12 17Z"/><path d="M16 4h4v2l-3.3 4h3.3v2h-6v-2l3.3-4h-3.3Z"/></svg>` 
   },
   'slime-unlocked': { 
-    title: 'Alquimia', 
-    desc: 'Desbloqueou a física de Slime!', 
-    icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31M14 2v7.31M8.5 2h7M14 9.3a6.5 6.5 0 1 1-4 0Z"/></svg>` 
+    icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>` 
   },
   'bubbles-cleared': { 
-    title: 'Estourador', 
-    desc: 'Estourou todas as bolhas da grade!', 
     icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="8" cy="9" r="2"/><circle cx="15" cy="14" r="3"/><circle cx="15" cy="8" r="1"/></svg>` 
   },
   'knife-kill': { 
-    title: '???', 
-    desc: 'Segredo oculto no jogo...', 
     icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>` 
+  }
+};
+
+const TRANSLATIONS = {
+  pt: {
+    modes: {
+      classic: 'Borracha',
+      slime: 'Slime',
+      bubble: 'Plástico'
+    },
+    gridSize: 'Tamanho da Grade',
+    relaxationLevel: 'Nível de Relaxamento',
+    squeezes: 'Apertos',
+    maxForce: 'Força Máx',
+    mood: 'Foco',
+    achievements: 'Conquistas',
+    soundOn: 'Som: On',
+    soundOff: 'Som: Off',
+    reset: 'Resetar',
+    
+    achList: {
+      'first-press': { title: '1º Aperto', desc: 'Iniciou sua jornada anti-estresse!' },
+      'force-100': { title: 'Super Força', desc: 'Apertou com força máxima!' },
+      'satisfaction-100': { title: 'Soneca', desc: 'Deixou a bolinha tirar um cochilo por 10s!' },
+      'slime-unlocked': { title: 'Alquimia', desc: 'Desbloqueou o modo Slime!' },
+      'bubbles-cleared': { title: 'Estourador', desc: 'Estourou todas as bolhas da grade!' },
+      'knife-kill': { title: '???', desc: '???' },
+      'knife-kill-unlocked': { title: 'Estressado', desc: 'Você furou a bolinha com a faca secreta!' }
+    },
+    toasts: {
+      ready: 'Pronto para relaxar',
+      regenerating: 'Regenerando bolhas...',
+      regenerated: 'Bolinha regenerada!',
+      stab: 'Acho que você deveria ir relaxar...',
+      peace: 'A paz foi restaurada!',
+      soundOn: 'Sons ativados',
+      soundOff: 'Sons desativados',
+      policeLeft: 'A viatura foi embora.',
+      knifeAway: 'Faca guardada',
+      huntStart: '🔪 Caça iniciada! Pegue a bolinha!',
+      detained: '🚨 O estressado foi detido!',
+      sleep: '💤 Shhh... A bolinha dormiu!',
+      wake: 'Bolinha acordou!',
+      resetSuccess: 'Progresso reiniciado!'
+    },
+    moods: {
+      satisfied: 'Satisfeito',
+      focused: 'Focado',
+      panic: 'Pânico',
+      deflated: 'Murcho',
+      reporting: 'Denunciando',
+      cornered: 'Encurralado',
+      scared: 'Assustado',
+      superZen: 'Super Zen',
+      zen: 'Zen',
+      relaxed: 'Relaxado',
+      calm: 'Calmo',
+      sleeping: 'Dormindo'
+    },
+    policeFail: 'É, a gente tentou...'
+  },
+  en: {
+    modes: {
+      classic: 'Rubber',
+      slime: 'Slime',
+      bubble: 'Plastic'
+    },
+    gridSize: 'Grid Size',
+    relaxationLevel: 'Relaxation Level',
+    squeezes: 'Squeezes',
+    maxForce: 'Max Force',
+    mood: 'Mood',
+    achievements: 'Achievements',
+    soundOn: 'Sound: On',
+    soundOff: 'Sound: Off',
+    reset: 'Reset',
+    
+    achList: {
+      'first-press': { title: '1st Squeeze', desc: 'Began your stress-free journey!' },
+      'force-100': { title: 'Super Strength', desc: 'Squeezed with maximum force!' },
+      'satisfaction-100': { title: 'Nap Time', desc: 'Let the ball take a nap for 10s!' },
+      'slime-unlocked': { title: 'Alchemy', desc: 'Unlocked Slime mode!' },
+      'bubbles-cleared': { title: 'Popper', desc: 'Popped all bubbles in the grid!' },
+      'knife-kill': { title: '???', desc: '???' },
+      'knife-kill-unlocked': { title: 'Stressed', desc: 'You stabbed the ball with the secret knife!' }
+    },
+    toasts: {
+      ready: 'Ready to relax',
+      regenerating: 'Regenerating bubbles...',
+      regenerated: 'Ball regenerated!',
+      stab: 'I think you should go relax...',
+      peace: 'Peace has been restored!',
+      soundOn: 'Sound enabled',
+      soundOff: 'Sound disabled',
+      policeLeft: 'The police vehicle left.',
+      knifeAway: 'Knife put away',
+      huntStart: '🔪 Hunt started! Catch the ball!',
+      detained: '🚨 The stressed one has been detained!',
+      sleep: '💤 Shhh... The ball fell asleep!',
+      wake: 'Ball woke up!',
+      resetSuccess: 'Progress reset!'
+    },
+    moods: {
+      satisfied: 'Satisfied',
+      focused: 'Focused',
+      panic: 'Panic',
+      deflated: 'Deflated',
+      reporting: 'Reporting',
+      cornered: 'Cornered',
+      scared: 'Scared',
+      superZen: 'Super Zen',
+      zen: 'Zen',
+      relaxed: 'Relaxed',
+      calm: 'Calm',
+      sleeping: 'Sleeping'
+    },
+    policeFail: 'Well, we tried...'
   }
 };
 
@@ -401,18 +507,23 @@ function unlockAchievement(id) {
     navigator.vibrate(60);
   }
 
+  if (soundEnabled) {
+    playSoundEffect('achievement');
+  }
+
   const achievement = ACHIEVEMENTS[id];
+  const lang = TRANSLATIONS[currentLang];
   const popup = document.getElementById('achievementPopup');
   const popupIcon = document.getElementById('popupIcon');
   
   if (id === 'knife-kill') {
     popupIcon.innerHTML = KNIFE_UNLOCKED_ICON;
-    document.getElementById('popupTitle').textContent = "Estressado";
-    document.getElementById('popupDesc').textContent = "Você furou a bolinha com a faca secreta!";
+    document.getElementById('popupTitle').textContent = lang.achList['knife-kill-unlocked'].title;
+    document.getElementById('popupDesc').textContent = lang.achList['knife-kill-unlocked'].desc;
   } else {
     popupIcon.innerHTML = achievement.icon;
-    document.getElementById('popupTitle').textContent = achievement.title;
-    document.getElementById('popupDesc').textContent = achievement.desc;
+    document.getElementById('popupTitle').textContent = lang.achList[id].title;
+    document.getElementById('popupDesc').textContent = lang.achList[id].desc;
   }
 
   popup.classList.add('show');
@@ -424,6 +535,7 @@ function unlockAchievement(id) {
 function updateAchievementsUI() {
   const keys = Object.keys(ACHIEVEMENTS);
   let count = 0;
+  const lang = TRANSLATIONS[currentLang];
   
   keys.forEach(key => {
     const badge = document.getElementById(`badge-${key}`);
@@ -432,21 +544,22 @@ function updateAchievementsUI() {
     if (!badge || !iconDiv || !titleSpan) return;
     
     let info = ACHIEVEMENTS[key];
+    let txt = lang.achList[key];
     
     if (stats.achievements.includes(key)) {
       badge.classList.add('unlocked');
       count++;
       
       if (key === 'knife-kill') {
-        titleSpan.textContent = "Estressado";
+        titleSpan.textContent = lang.achList['knife-kill-unlocked'].title;
         iconDiv.innerHTML = KNIFE_UNLOCKED_ICON;
       } else {
-        titleSpan.textContent = info.title;
+        titleSpan.textContent = txt.title;
         iconDiv.innerHTML = info.icon;
       }
     } else {
       badge.classList.remove('unlocked');
-      titleSpan.textContent = info.title;
+      titleSpan.textContent = txt.title;
       iconDiv.innerHTML = info.icon;
     }
   });
@@ -455,34 +568,36 @@ function updateAchievementsUI() {
 }
 
 function getMoodText() {
+  const moods = TRANSLATIONS[currentLang].moods;
   if (currentMode === 'bubble') {
     const unpopped = bubbleWrap.bubbles.filter(b => !b.popped).length;
-    if (unpopped === 0) return 'Satisfeito';
-    return 'Focado';
+    if (unpopped === 0) return moods.satisfied;
+    return moods.focused;
   }
 
-  if (ball.isPunctured) return 'Pânico';
-  if (ball.respawnTimer > 0) return 'Murcho';
-  if (ball.isSleeping) return 'Dormindo';
-  if (ball.isCallingPolice) return 'Denunciando';
-  if (ball.isCornered) return 'Encurralado';
-  if (ball.isScared) return 'Assustado';
+  if (ball.isPunctured) return moods.panic;
+  if (ball.respawnTimer > 0) return moods.deflated;
+  if (ball.isSleeping) return moods.sleeping;
+  if (ball.isCallingPolice) return moods.reporting;
+  if (ball.isCornered) return moods.cornered;
+  if (ball.isScared) return moods.scared;
 
-  if (stats.satisfaction >= 90) return 'Super Zen';
-  if (stats.satisfaction >= 60) return 'Zen';
-  if (stats.satisfaction >= 30) return 'Relaxado';
-  return 'Calmo';
+  if (stats.satisfaction >= 90) return moods.superZen;
+  if (stats.satisfaction >= 60) return moods.zen;
+  if (stats.satisfaction >= 30) return moods.relaxed;
+  return moods.calm;
 }
 
 function toggleAudio() {
   soundEnabled = !soundEnabled;
   const audioBtn = document.getElementById('audioBtn');
+  const dict = TRANSLATIONS[currentLang];
   
   const onIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>`;
   const offIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>`;
   
-  audioBtn.innerHTML = (soundEnabled ? onIcon : offIcon) + (soundEnabled ? ' Som: On' : ' Som: Off');
-  showToast(soundEnabled ? 'Sons ativados' : 'Sons desativados');
+  audioBtn.innerHTML = (soundEnabled ? onIcon : offIcon) + ' ' + (soundEnabled ? dict.soundOn : dict.soundOff);
+  showToast(soundEnabled ? dict.toasts.soundOn : dict.toasts.soundOff);
 }
 
 let toastTimeout = null;
@@ -497,7 +612,8 @@ function showToast(message) {
 }
 
 function resetStats() {
-  if (confirm('Deseja reiniciar suas estatísticas e conquistas?')) {
+  const confirmMsg = currentLang === 'pt' ? 'Deseja reiniciar suas estatísticas e conquistas?' : 'Do you want to reset your statistics and achievements?';
+  if (confirm(confirmMsg)) {
     stats.pressCount = 0;
     stats.maxForce = 0;
     stats.satisfaction = 0;
@@ -511,7 +627,7 @@ function resetStats() {
     
     updateAchievementsUI();
     initBubbleWrap();
-    showToast('Progresso reiniciado!');
+    showToast(TRANSLATIONS[currentLang].toasts.resetSuccess);
   }
 }
 
@@ -555,6 +671,7 @@ function toggleKnifeMode() {
   if (ball.isPunctured || ball.respawnTimer > 0 || currentMode === 'bubble') return;
 
   knifeMode = !knifeMode;
+  const dict = TRANSLATIONS[currentLang];
   
   if (knifeMode) {
     playSoundEffect('shwing');
@@ -564,10 +681,10 @@ function toggleKnifeMode() {
     ball.lastKnifeMoveTime = Date.now();
     ball.isCallingPolice = false;
     
-    showToast("🔪 Caça iniciada! Pegue a bolinha!");
+    showToast(dict.toasts.huntStart);
   } else {
     shrinkCanvasToNormal();
-    showToast("Faca guardada");
+    showToast(dict.toasts.knifeAway);
   }
 }
 
@@ -578,12 +695,13 @@ function switchMode(mode) {
   document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
   
   const bubbleSettings = document.getElementById('bubbleSettings');
+  const dict = TRANSLATIONS[currentLang];
   let modeName = '';
   
   if (knifeMode) {
     knifeMode = false;
     shrinkCanvasToNormal();
-    showToast("Faca guardada");
+    showToast(dict.toasts.knifeAway);
   }
   
   if (mode === 'classic') {
@@ -593,7 +711,7 @@ function switchMode(mode) {
     ball.kDamping = 0.78;
     ball.baseRadius = 75;
     canvas.style.cursor = 'grab';
-    modeName = 'Borracha';
+    modeName = dict.modes.classic;
 
     canvasFrame.style.borderRadius = '50%';
     canvasFrame.style.background = 'radial-gradient(circle at center, #ffffff 0%, #f9fafb 70%)';
@@ -606,7 +724,7 @@ function switchMode(mode) {
     ball.kDamping = 0.92;
     ball.baseRadius = 70;
     canvas.style.cursor = 'grab';
-    modeName = 'Slime Pastel';
+    modeName = dict.modes.slime;
     unlockAchievement('slime-unlocked');
 
     canvasFrame.style.borderRadius = '50%';
@@ -618,7 +736,7 @@ function switchMode(mode) {
     bubbleSettings.style.display = 'flex';
     canvas.style.cursor = 'pointer';
     initBubbleWrap();
-    modeName = 'Plástico Bolha';
+    modeName = dict.modes.bubble;
 
     canvasFrame.style.borderRadius = 'var(--radius-lg)';
     canvasFrame.style.background = '#f9f9fb';
@@ -659,7 +777,7 @@ function punctureBall(clickX, clickY) {
     policeState.failed = true;
     policeState.failTimer = 0;
   } else {
-    showToast("Acho que você deveria ir relaxar...");
+    showToast(TRANSLATIONS[currentLang].toasts.stab);
   }
 }
 
@@ -672,7 +790,7 @@ function wakeBall() {
     // Partículas de travesseiro
     createParticles(ball.x, ball.y, 'rgba(243, 244, 246, 0.95)', 15, 0.7);
     playSoundEffect('release');
-    showToast("Bolinha acordou!");
+    showToast(TRANSLATIONS[currentLang].toasts.wake);
   }
 }
 
@@ -711,7 +829,7 @@ function handlePointerDown(e) {
       const unpopped = bubbleWrap.bubbles.filter(b => !b.popped).length;
       if (unpopped === 0) {
         unlockAchievement('bubbles-cleared');
-        showToast('Regenerando bolhas...');
+        showToast(TRANSLATIONS[currentLang].toasts.regenerating);
         setTimeout(initBubbleWrap, 800);
       }
     }
@@ -753,11 +871,19 @@ function handlePointerDown(e) {
 }
 
 function handlePointerMove(e) {
-  wakeBall();
   const pos = getPointerPos(e);
 
   if (policeState.active && policeState.capturing) {
     return;
+  }
+
+  const dxMove = pos.x - pointer.x;
+  const dyMove = pos.y - pointer.y;
+  const moveDist = Math.sqrt(dxMove*dxMove + dyMove*dyMove);
+
+  // Só acorda se houver movimento físico maior que 1.2px (evita disparos contínuos fantasmas de mousemove)
+  if (moveDist > 1.2) {
+    wakeBall();
   }
 
   pointer.x = pos.x;
@@ -880,7 +1006,7 @@ function updatePhysics() {
       if (!ball.isSleeping) {
         ball.isSleeping = true;
         ball.sleepDuration = 0;
-        showToast("💤 Shhh... A bolinha dormiu!");
+        showToast(TRANSLATIONS[currentLang].toasts.sleep);
       }
       ball.sleepDuration += 16.67;
       
@@ -894,7 +1020,7 @@ function updatePhysics() {
         ball.sleepDuration = 0;
         createParticles(ball.x, ball.y, 'rgba(243, 244, 246, 0.95)', 15, 0.7);
         playSoundEffect('release');
-        showToast("Bolinha acordou!");
+        showToast(TRANSLATIONS[currentLang].toasts.wake);
       }
     }
 
@@ -912,7 +1038,7 @@ function updatePhysics() {
       ball.isSleeping = false;
       ball.sleepDuration = 0;
       createParticles(ball.x, ball.y, 'rgba(243, 244, 246, 0.95)', 15, 0.7);
-      showToast("Bolinha acordou!");
+      showToast(TRANSLATIONS[currentLang].toasts.wake);
     }
     ball.lastUserInteractionTime = Date.now();
   }
@@ -930,7 +1056,7 @@ function updatePhysics() {
       ball.baseRadius = 5;
       ball.pressStrength = 0;
       initBallPoints();
-      showToast("Bolinha regenerada!");
+      showToast(TRANSLATIONS[currentLang].toasts.regenerated);
       
       if (knifeMode) {
         knifeMode = false;
@@ -1232,7 +1358,7 @@ function updatePhysics() {
           
           shrinkCanvasToNormal();
           canvas.style.cursor = 'grab';
-          showToast("A viatura foi embora.");
+          showToast(TRANSLATIONS[currentLang].toasts.policeLeft);
         }
       }
     } else {
@@ -1276,7 +1402,7 @@ function updatePhysics() {
             policeState.capturedPointerX = pointer.x;
             policeState.capturedPointerY = pointer.y;
             canvas.style.cursor = 'none'; // Confisca o cursor físico do usuário
-            showToast("🚨 O estressado foi detido!");
+            showToast(TRANSLATIONS[currentLang].toasts.detained);
           }
         });
 
@@ -1310,7 +1436,7 @@ function updatePhysics() {
           
           shrinkCanvasToNormal();
           canvas.style.cursor = 'grab'; // Restaura o cursor
-          showToast("A paz foi restaurada!");
+          showToast(TRANSLATIONS[currentLang].toasts.peace);
         }
       }
     }
@@ -1622,11 +1748,11 @@ function drawBall() {
     ctx.roundRect(phoneX - 3, phoneY - 6, 6, 10, 1);
     ctx.fill();
 
-    // SCRIPT DE DIÁLOGOS DO 190 (tamanho dinâmico do canvas)
+    // SCRIPT DE DIÁLOGOS DO 190 (tamanho dinâmico do canvas e bilíngue)
     const rect = canvas.getBoundingClientRect();
     const canvasSizeStr = `${Math.round(rect.width)}x${Math.round(rect.height)}`;
 
-    const POLICE_DIALOGUE = [
+    const POLICE_DIALOGUE = currentLang === 'pt' ? [
       { sender: 'ball', text: 'Alô, é do 190?!' },
       { sender: 'police', text: 'PM. Qual a emergência?' },
       { sender: 'ball', text: 'Tem um maluco com uma faca!' },
@@ -1637,6 +1763,17 @@ function drawBall() {
       { sender: 'police', text: 'Não faça movimentos bruscos.' },
       { sender: 'ball', text: 'Socorrooo!' },
       { sender: 'police', text: 'Chegamos. Fique frio!' }
+    ] : [
+      { sender: 'ball', text: 'Hello, is this 911?!' },
+      { sender: 'police', text: 'Police. What is your emergency?' },
+      { sender: 'ball', text: 'There is a maniac with a knife!' },
+      { sender: 'police', text: 'Stay calm. Your location?' },
+      { sender: 'ball', text: `In a ${canvasSizeStr} canvas!` },
+      { sender: 'police', text: 'The squad car is on its way.' },
+      { sender: 'ball', text: 'Quick, he is staring at me!' },
+      { sender: 'police', text: 'Do not make sudden moves.' },
+      { sender: 'ball', text: 'Help meee!' },
+      { sender: 'police', text: 'We are here. Stay cool!' }
     ];
 
     const currentStep = (ball.policeDialogueStep || 0) % POLICE_DIALOGUE.length;
@@ -2105,7 +2242,7 @@ function drawPolice() {
 
   // Desenhar balão de diálogo de falha da polícia
   if (policeState.failed && policeState.failTimer < 2500 && policeState.officers.length > 0) {
-    const msgText = "É, a gente tentou...";
+    const msgText = TRANSLATIONS[currentLang].policeFail;
     ctx.font = 'bold 12px Outfit, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -2206,9 +2343,74 @@ function setupInputEvents() {
   });
 }
 
+function switchLanguage(lang) {
+  if (lang !== 'pt' && lang !== 'en') return;
+  currentLang = lang;
+  localStorage.setItem('sq_lang', lang);
+
+  // Atualiza botões ativos do alternador
+  document.getElementById('lang-pt').classList.toggle('active', lang === 'pt');
+  document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+
+  const dict = TRANSLATIONS[lang];
+
+  // Traduz botões do seletor de modo mantendo ícones SVGs
+  const btnClassic = document.getElementById('btn-mode-classic');
+  const btnSlime = document.getElementById('btn-mode-slime');
+  const btnBubble = document.getElementById('btn-mode-bubble');
+
+  if (btnClassic) {
+    btnClassic.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><circle cx="12" cy="10" r="8"/><path d="M12 18v4"/></svg> ${dict.modes.classic}`;
+  }
+  if (btnSlime) {
+    btnSlime.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> ${dict.modes.slime}`;
+  }
+  if (btnBubble) {
+    btnBubble.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><circle cx="7" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><circle cx="7" cy="17" r="3"/><circle cx="17" cy="17" r="3"/></svg> ${dict.modes.bubble}`;
+  }
+
+  // Elementos do Grid de Configurações
+  const labelGridSize = document.getElementById('label-grid-size');
+  if (labelGridSize) labelGridSize.textContent = dict.gridSize;
+
+  const labelSatisfaction = document.getElementById('label-satisfaction');
+  if (labelSatisfaction) labelSatisfaction.textContent = dict.relaxationLevel;
+
+  // Estatísticas
+  const labelStatPress = document.getElementById('label-stat-press');
+  if (labelStatPress) labelStatPress.textContent = dict.squeezes;
+
+  const labelStatForce = document.getElementById('label-stat-force');
+  if (labelStatForce) labelStatForce.textContent = dict.maxForce;
+
+  const labelStatMood = document.getElementById('label-stat-mood');
+  if (labelStatMood) labelStatMood.textContent = dict.mood;
+
+  // Conquistas
+  const labelAchievements = document.getElementById('label-achievements');
+  if (labelAchievements) labelAchievements.textContent = dict.achievements;
+
+  // Rodapé
+  const audioBtn = document.getElementById('audioBtn');
+  if (audioBtn) {
+    audioBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> ${soundEnabled ? dict.soundOn : dict.soundOff}`;
+  }
+
+  const resetBtn = document.getElementById('resetBtn');
+  if (resetBtn) {
+    resetBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg> ${dict.reset}`;
+  }
+
+  // Atualiza conquistas
+  updateAchievementsUI();
+  
+  // Exibe toast informativo do idioma carregado
+  showToast(dict.toasts.ready);
+}
+
 function init() {
   initBallPoints();
-  updateAchievementsUI();
+  switchLanguage(currentLang);
   setupInputEvents();
   loop();
 }
