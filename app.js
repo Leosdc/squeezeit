@@ -2390,7 +2390,11 @@ function setupInputEvents() {
 
   let titleClicks = 0;
   let titleClickTimeout = null;
-  document.getElementById('titleHeader').addEventListener('click', () => {
+  
+  const handleTitleClick = (e) => {
+    if (e && e.type === 'touchstart') {
+      e.preventDefault(); // Evita delay de clique no mobile e double-tap zoom
+    }
     titleClicks++;
     clearTimeout(titleClickTimeout);
     titleClickTimeout = setTimeout(() => { titleClicks = 0; }, 1200);
@@ -2399,7 +2403,11 @@ function setupInputEvents() {
       toggleKnifeMode();
       titleClicks = 0;
     }
-  });
+  };
+
+  const titleHeader = document.getElementById('titleHeader');
+  titleHeader.addEventListener('click', handleTitleClick);
+  titleHeader.addEventListener('touchstart', handleTitleClick, { passive: false });
 }
 
 function switchLanguage(lang) {
