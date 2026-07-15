@@ -18,7 +18,7 @@ The application employs a custom soft-body physics engine based on Verlet integr
 Audio effects are generated dynamically via the **Web Audio API** to avoid latency and overhead associated with static audio files:
 - **Compress (Press)**: An oscillator node sweeps from high to low frequencies (frequency modulation) combined with a gain node envelope to produce a squish sound.
 - **Release**: A rapid, short noise envelope combined with a low-pass filter simulates the rubber returning to its resting state.
-- **Plástico Mode**: Generates high-Q bandpass filtered pulses mimicking the popping sound of bubble wrap bubbles.
+- **Plastic Mode**: Generates high-Q bandpass filtered pulses mimicking the popping sound of bubble wrap bubbles.
 
 ---
 
@@ -35,7 +35,7 @@ While designed as a stress-relief simulator, the codebase contains advanced stat
 - **Inactivity Trigger**: In normal simulation modes, if no mouse movement or click is registered for 10 seconds, the idle loop starts.
 - **Center Alignment**: The ball is attracted back to the center coordinates of the canvas, and its velocity vectors are dampened.
 - **Visual Accessories**: The renderer draws a pillow asset behind the ball and a blanket asset over its lower nodes.
-- **State Change**: The mood metric changes to `"Dormindo"`, eyes close into soft arcs, and a floating particle loop renders "Zzz" characters rising in ascending trajectories.
+- **State Change**: The mood metric changes to `"Sleeping"`, eyes close into soft arcs, and a floating particle loop renders "Zzz" characters rising in ascending trajectories.
 - **Interrupt Handler**: Any physical input instantly wakes the ball, launching pillow feather particles and restoring the standard loop.
 
 ---
