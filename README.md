@@ -24,22 +24,12 @@ Audio effects are generated dynamically via the **Web Audio API** to avoid laten
 
 While designed as a stress-relief simulator, the codebase contains advanced state machines that alter the physics loop based on behavioral triggers:
 
-### 1. Threat Avoidance & Proximity Stress (Knife Mode)
-- **Trigger**: Activated by registering 5 sequential click events on the main header.
-- **Pathology**: The cursor changes to a blade vector, and the ball enters a high-alert panic state.
-- **Vector Evading**: The physics loop calculates the distance between the ball and the pointer. A strong repelling impulse is added to the ball's velocity vector, driving it away from the cursor.
-- **Facial Deformation**: The panic factor (ranging from 0.0 to 1.0) dynamically scales the eyes and pupil sizes, simulating fear. If cornered near the canvas boundaries, the ball enters a high-frequency shaking loop and covers its face.
+### 1. Undocumented Crisis Scenarios
+- **Threat Evading Loop**: Under specific input conditions, the application enters an undocumented alert state. The physical simulator adds a strong repelling impulse vector driving the ball away from pointer coordinates, scaling facial panic deformities and border-check constraints.
+- **Crisis Response Sequence**: If physical inputs remain stagnant during this active threat alert, the simulation triggers a complex response sequence involving localized UI communication rendering, tactical intercept assets, and cursor control confiscation overrides.
+- **Operational Failure State**: Successfully evading tactical units during the chase triggers an operational failure sequence, leading to local state cleanup and a clean simulator reset.
 
-### 2. Thread Contention & Emergency Dispatch (The 190 Event)
-- **Communication Flow**: If the cursor (threat) remains stationary for 3 seconds, the ball stops fleeing, spawns a cellular phone interface, and initiates a synchronous 10-step chat dialogue with the local emergency dispatch (190). Text boxes are dynamically sized at runtime using canvas context text measurement APIs (`measureText`).
-- **Tactical Interception**: Upon dialogue termination, a vehicle asset (190px width) enters the viewport, and two tactical officers (35px radius) deploy. They chase the threat using gravitational acceleration physics.
-- **User Input Confiscation**: Upon collision with the cursor, the tactical officer captures pointer coordinates. The browser cursor style is set to `none`, completely neutralizing user control. The cursor is towed back to the vehicle, and the simulation resets.
-- **Mission Failure State**: If the user manages to evade the officers and stab the ball during the active chase:
-  - The chase loop is immediately aborted to prevent state concurrency bugs.
-  - The officers halt their vectors, walk toward each other, align their pupils, and output a dialogue bubble: *"É, a gente tentou..."*.
-  - They return to the vehicle, which reverses out of the screen before triggering the simulation reset.
-
-### 3. Idle / Sleep State Machine
+### 2. Idle / Sleep State Machine
 - **Inactivity Trigger**: In normal simulation modes, if no mouse movement or click is registered for 10 seconds, the idle loop starts.
 - **Center Alignment**: The ball is attracted back to the center coordinates of the canvas, and its velocity vectors are dampened.
 - **Visual Accessories**: The renderer draws a pillow asset behind the ball and a blanket asset over its lower nodes.
