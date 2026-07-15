@@ -580,7 +580,7 @@ footer a:hover {
     height: 220px;
   }
 
-  canvas {
+  canvas:not(.fullscreen) {
     width: 210px !important;
     height: 210px !important;
   }

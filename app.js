@@ -637,6 +637,7 @@ function expandCanvasToFullScreen() {
   ball.x = rect.left + rect.width / 2;
   ball.y = rect.top + rect.height / 2;
 
+  canvas.classList.add('fullscreen');
   canvas.style.position = 'fixed';
   canvas.style.left = '0';
   canvas.style.top = '0';
@@ -650,6 +651,7 @@ function expandCanvasToFullScreen() {
 }
 
 function shrinkCanvasToNormal() {
+  canvas.classList.remove('fullscreen');
   canvas.style.position = '';
   canvas.style.left = '';
   canvas.style.top = '';
