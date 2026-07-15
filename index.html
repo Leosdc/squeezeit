@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Squeeze.it — Bolinha Anti-Estresse Premium</title>
+  <meta name="description" content="Aperte, esmague e relaxe com a bolinha anti-estresse virtual mais satisfatória da web. Sons sintetizados e física realista.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+
+  <!-- Folha de Estilo Externa -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1 id="titleHeader" style="cursor: pointer;">Squeeze.it</h1>
+  </header>
+
+  <main class="app-card">
+    <div class="toast" id="infoToast">Pronto para relaxar</div>
+
+    <!-- Lado do Canvas (Esquerdo no desktop menor que FHD) -->
+    <div class="canvas-side">
+      <!-- Seletor de Modo -->
+      <div class="mode-selector">
+        <button class="mode-btn active" onclick="switchMode('classic')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><circle cx="12" cy="10" r="8"/><path d="M12 18v4"/></svg>
+          Borracha
+        </button>
+        <button class="mode-btn" onclick="switchMode('slime')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+          Slime
+        </button>
+        <button class="mode-btn" onclick="switchMode('bubble')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><circle cx="7" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><circle cx="7" cy="17" r="3"/><circle cx="17" cy="17" r="3"/></svg>
+          Plástico
+        </button>
+      </div>
+
+      <!-- Área de Interação -->
+      <div class="canvas-container" id="canvasFrame">
+        <canvas id="stressBall" width="280" height="280"></canvas>
+      </div>
+
+      <!-- Opções da grade do Plástico Bolha -->
+      <div class="bubble-settings" id="bubbleSettings" style="display: none;">
+        <span class="settings-label">Tamanho da Grade</span>
+        <div class="grid-options">
+          <button class="grid-opt-btn" onclick="changeGridSize(4)">4x4</button>
+          <button class="grid-opt-btn active" onclick="changeGridSize(6)">6x6</button>
+          <button class="grid-opt-btn" onclick="changeGridSize(8)">8x8</button>
+          <button class="grid-opt-btn" onclick="changeGridSize(10)">10x10</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lado dos Controles (Direito no desktop menor que FHD) -->
+    <div class="control-side">
+      <!-- Nível de Satisfação -->
+      <div class="satisfaction-panel">
+        <div class="satisfaction-header">
+          <span>Nível de Relaxamento</span>
+          <span id="satisfactionPct">0%</span>
+        </div>
+        <div class="satisfaction-bar">
+          <div class="satisfaction-fill" id="satisfactionFill"></div>
+        </div>
+      </div>
+
+      <!-- Grid de Estatísticas -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Apertos</div>
+          <div class="stat-value" id="statPressCount">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Força Máx</div>
+          <div class="stat-value" id="statMaxForce">0%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Foco</div>
+          <div class="stat-value" id="statMood">Calmo</div>
+        </div>
+      </div>
+
+      <!-- Painel de Conquistas -->
+      <div class="achievements-panel">
+        <div class="achievements-header">
+          <span>Conquistas</span>
+          <span id="unlockedRatio" style="color: var(--accent-color);">0/6</span>
+        </div>
+        <div class="achievements-list">
+          <div class="achievement-badge" id="badge-first-press">
+            <div class="badge-icon" id="icon-first-press"></div>
+            <span class="badge-title" id="title-first-press">1º Aperto</span>
+          </div>
+          <div class="achievement-badge" id="badge-force-100">
+            <div class="badge-icon" id="icon-force-100"></div>
+            <span class="badge-title" id="title-force-100">Super Força</span>
+          </div>
+          <div class="achievement-badge" id="badge-satisfaction-100">
+            <div class="badge-icon" id="icon-satisfaction-100"></div>
+            <span class="badge-title" id="title-satisfaction-100">Soneca</span>
+          </div>
+          <div class="achievement-badge" id="badge-slime-unlocked">
+            <div class="badge-icon" id="icon-slime-unlocked"></div>
+            <span class="badge-title" id="title-slime-unlocked">Alquimia</span>
+          </div>
+          <div class="achievement-badge" id="badge-bubbles-cleared">
+            <div class="badge-icon" id="icon-bubbles-cleared"></div>
+            <span class="badge-title" id="title-bubbles-cleared">Estourador</span>
+          </div>
+          <div class="achievement-badge" id="badge-knife-kill">
+            <div class="badge-icon" id="icon-knife-kill"></div>
+            <span class="badge-title" id="title-knife-kill">???</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controles do Rodapé -->
+      <div class="footer-controls">
+        <button class="ctrl-btn" onclick="toggleAudio()" id="audioBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+          Som: On
+        </button>
+        <button class="ctrl-btn" onclick="resetStats()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px; vertical-align: middle;"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Resetar
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Popup Flutuante de Conquista -->
+  <div class="achievement-popup" id="achievementPopup">
+    <div class="popup-icon" id="popupIcon"></div>
+    <div class="popup-text">
+      <h4 id="popupTitle">Conquista!</h4>
+      <p id="popupDesc">Você alcançou um novo marco.</p>
+    </div>
+  </div>
+
+  <footer>
+    Hospedado no <a href="https://github.com" target="_blank" rel="noopener">GitHub Pages</a>
+  </footer>
+
+  <!-- Script Externo Deferido -->
+  <script src="app.js" defer></script>
+</body>
+</html>
