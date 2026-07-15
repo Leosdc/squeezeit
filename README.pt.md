@@ -2,7 +2,7 @@
 
 Squeeze.it é um simulador de alívio de estresse de alta fidelidade executado inteiramente no navegador (client-side). O projeto roda sem qualquer dependência de frameworks externos, fornecendo uma bolinha elástica de corpo mole (soft-body) fluida, física e altamente interativa.
 
-[Read in English](README.md)
+[Read in English](README.md) | **Demonstração Online**: [leosdc.github.io/squeezeit](https://leosdc.github.io/squeezeit/)
 
 ---
 
