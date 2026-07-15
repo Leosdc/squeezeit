@@ -675,7 +675,7 @@ function toggleKnifeMode() {
   
   if (knifeMode) {
     playSoundEffect('shwing');
-    canvas.style.cursor = "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' style='font-size:24px'><text y='24'>🔪</text></svg>\") 0 24, pointer";
+    canvas.style.cursor = 'none';
     
     expandCanvasToFullScreen();
     ball.lastKnifeMoveTime = Date.now();
@@ -1396,8 +1396,10 @@ function updatePhysics() {
           off.x += off.vx;
           off.y += off.vy;
 
-          // Captura da faca (limiar de colisão aumentado devido ao tamanho gigante de raio 35)
-          if (!policeState.capturing && idx === 0 && odist < 40) {
+          // Captura da faca (no mobile, só captura se o usuário estiver ativamente tocando a tela para dar chance de fuga)
+          const isMobileDevice = ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+          const canCapture = !isMobileDevice || pointer.isDown;
+          if (!policeState.capturing && idx === 0 && odist < 40 && canCapture) {
             policeState.capturing = true;
             policeState.capturedPointerX = pointer.x;
             policeState.capturedPointerY = pointer.y;
@@ -2282,6 +2284,60 @@ function drawPolice() {
   }
 }
 
+function drawVirtualKnife() {
+  if (!knifeMode || ball.isPunctured || ball.respawnTimer > 0) return;
+  
+  ctx.save();
+  ctx.translate(pointer.x, pointer.y);
+  
+  // Aponta a ponta da faca em direção ao centro da bolinha
+  const dx = ball.x - pointer.x;
+  const dy = ball.y - pointer.y;
+  const angle = Math.atan2(dy, dx);
+  ctx.rotate(angle + Math.PI / 4); // Alinha com o eixo diagonal da lâmina
+
+  // No mobile, se o dedo não estiver tocando a tela, desenha a faca semi-transparente
+  const isMobileDevice = ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  if (isMobileDevice && !pointer.isDown) {
+    ctx.globalAlpha = 0.35;
+  }
+
+  // Cabo (Madeira marrom)
+  ctx.fillStyle = '#78350f';
+  ctx.beginPath();
+  ctx.roundRect(-4, 12, 8, 18, 2);
+  ctx.fill();
+  
+  // Guarda (Metal dourado)
+  ctx.fillStyle = '#d97706';
+  ctx.beginPath();
+  ctx.roundRect(-7, 9, 14, 3, 1);
+  ctx.fill();
+
+  // Lâmina (Aço prateado)
+  ctx.fillStyle = '#f3f4f6';
+  ctx.strokeStyle = '#9ca3af';
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  ctx.moveTo(-3.5, 9);
+  ctx.lineTo(-3.5, -20);
+  ctx.quadraticCurveTo(-3.5, -27, 3.5, -27); // Ponta
+  ctx.lineTo(3.5, 9);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Detalhe de corte / fio da lâmina (linha de luz interna)
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.moveTo(1.2, 7);
+  ctx.lineTo(1.2, -24);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
 function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -2297,6 +2353,7 @@ function loop() {
   }
 
   updateAndDrawParticles();
+  drawVirtualKnife();
 
   document.getElementById('statPressCount').textContent = stats.pressCount;
   document.getElementById('statMaxForce').textContent = stats.maxForce + '%';
