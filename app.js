@@ -186,6 +186,7 @@ const ball = {
   isCallingPolice: false,
   lastKnifeMoveTime: 0,
   isSleeping: false,
+  sleepStartTime: 0,
   sleepDuration: 0,
   lastUserInteractionTime: Date.now()
 };
@@ -787,6 +788,7 @@ function wakeBall() {
   ball.lastUserInteractionTime = Date.now();
   if (ball.isSleeping) {
     ball.isSleeping = false;
+    ball.sleepStartTime = 0;
     ball.sleepDuration = 0;
     
     // Partículas de travesseiro
@@ -1007,10 +1009,11 @@ function updatePhysics() {
     if (idleTime > 10000) { // 10 segundos inativo
       if (!ball.isSleeping) {
         ball.isSleeping = true;
+        ball.sleepStartTime = Date.now();
         ball.sleepDuration = 0;
         showToast(TRANSLATIONS[currentLang].toasts.sleep);
       }
-      ball.sleepDuration += 16.67;
+      ball.sleepDuration = Date.now() - ball.sleepStartTime;
       
       // Se dormir por 10s contínuos, ganha a conquista!
       if (ball.sleepDuration >= 10000) {
@@ -1019,6 +1022,7 @@ function updatePhysics() {
     } else {
       if (ball.isSleeping) {
         ball.isSleeping = false;
+        ball.sleepStartTime = 0;
         ball.sleepDuration = 0;
         createParticles(ball.x, ball.y, 'rgba(243, 244, 246, 0.95)', 15, 0.7);
         playSoundEffect('release');
@@ -1038,6 +1042,7 @@ function updatePhysics() {
   } else {
     if (ball.isSleeping) {
       ball.isSleeping = false;
+      ball.sleepStartTime = 0;
       ball.sleepDuration = 0;
       createParticles(ball.x, ball.y, 'rgba(243, 244, 246, 0.95)', 15, 0.7);
       showToast(TRANSLATIONS[currentLang].toasts.wake);
